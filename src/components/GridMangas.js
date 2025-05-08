@@ -12,7 +12,6 @@ const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: '#050505',
   ...theme.typography.body2,
   padding: theme.spacing(1),
-  // textAlign: 'center',
   color: (theme.vars ?? theme).palette.text.secondary,
   height: '310px',
   borderRadius: '8px',
@@ -20,13 +19,11 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 
-export default function ResponsiveGrid() {
+export default function MangasGrid() {
   const mangas = useSelector(map_mangas)
-
   return (
     <Box sx={{ flexGrow: 1 }} height='100%'>
       <Grid container spacing={{ xs: 1, md: 1, xl: 2 }}>
-        
         {mangas.map((manga, index) => (
           <Grid key={index} width={'205px'} flexWrap='wrap'>
             <Item alignContent='center'>
