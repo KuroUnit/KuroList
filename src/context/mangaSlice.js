@@ -35,6 +35,8 @@ export const map_page = (state) => state.manga.page
 export const map_mangas = (state) => state.manga.mangas
 export const mangaActions = mangaSlice.actions
 
+export default mangaSlice.reducer;
+
 export const find_mangas = (pagination={limit:48, offset:0}, title=false) => async (dispatch) => {
   const resp = await axios({
     method: 'GET',
@@ -47,14 +49,12 @@ export const find_mangas = (pagination={limit:48, offset:0}, title=false) => asy
       'includes[]': ['cover_art'],
       ...(title && {'title': title})
     }
-    
   });
   const api_response = resp.data;
 
-  // Não pode ser usado por causa do limite do offset + limit da api ter que ser menor que 10000
+  // Definido dessa forma por causa do limite do offset + limit da api que deve ser menor que 10000
   dispatch(mangaActions.set_total(Math.min(api_response.total, 10000)))
 
-  
   const mangasData = api_response.data.map((manga) => {
     const coverRel = manga.relationships.find(rel => rel.type === 'cover_art');
     const fileName = coverRel?.attributes?.fileName;
@@ -73,5 +73,3 @@ export const find_mangas = (pagination={limit:48, offset:0}, title=false) => asy
   });
   dispatch(mangaActions.set_mangas(mangasData))
 };
-
-export default mangaSlice.reducer;
