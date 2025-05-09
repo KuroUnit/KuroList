@@ -2,14 +2,15 @@ import { createSlice } from "@reduxjs/toolkit";
 
 export const uiSlice = createSlice({
   name: 'ui',
-  initialState: {open: true, drawer: 'mangas'},
+  initialState: {open: true, drawer: 'Mangas'},
   reducers: {
     set_open: (state, action)=>{
       state.open = action.payload
       return state;
     },
     set_drawer: (state, action)=>{
-      state.open = action.payload
+      state.drawer = action.payload
+      console.log(state.drawer)
       return state;
     }
   }

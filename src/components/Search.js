@@ -3,6 +3,8 @@ import { styled, alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import InputBase from '@mui/material/InputBase';
 import SearchIcon from '@mui/icons-material/Search';
+import { mangaActions } from '../context/mangaSlice';
+import { useDispatch } from 'react-redux';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -49,9 +51,22 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 
 export default function SearchBar() {
+  const dispatch = useDispatch();
+  
+  const handleSearch = (ev) => {
+    dispatch(mangaActions.set_search(ev.target.value));
+    dispatch(mangaActions.set_pagination({ offset: 0 }));
+  };
+  
+  const handleClear = () => {
+    dispatch(mangaActions.set_search(''));
+    dispatch(mangaActions.set_pagination({ offset: 0 }));
+  };
+  
+  
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <Search>
+      <Search onKeyUp={(ev) => (ev.target.value !== '') ? handleSearch(ev) : handleClear()}>
         <SearchIconWrapper>
           <SearchIcon />
         </SearchIconWrapper>

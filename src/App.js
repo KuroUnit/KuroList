@@ -5,8 +5,8 @@ import Drawer from './components/Drawer';
 
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 
-import { find_mangas } from './context/mangaSlice';
-import { useDispatch } from 'react-redux';
+import { find_mangas, map_search,map_pagination } from './context/mangaSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 const darkTheme = createTheme({
   palette: {
@@ -15,14 +15,17 @@ const darkTheme = createTheme({
 });
 
 function App() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch(),
+        pagination = useSelector(map_pagination),
+        search = useSelector(map_search)
   
+
   useEffect(() => {
     const timer_id = setTimeout(() => {
-      dispatch(find_mangas())
-    }, (1000*1));
+      dispatch(find_mangas(pagination, search))
+    }, (10));
     return () => clearTimeout(timer_id);
-  }, [dispatch]);
+  }, [dispatch, pagination, search]);
 
   return (
     <ThemeProvider theme={darkTheme}>

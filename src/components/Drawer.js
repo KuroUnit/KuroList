@@ -21,9 +21,11 @@ import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 
 import SearchBar from './Search';
 import GridMangas from './GridMangas';
+import GridLists from './GridLists'
 
 import { useSelector, useDispatch } from 'react-redux';
-import { map_open, uiActions } from '../context/uiSlice';
+import { map_drawer, map_open, uiActions } from '../context/uiSlice';
+import PaginationRounded from './Pagination'
 
 const drawerWidth = 240;
 
@@ -84,7 +86,8 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
 export default function PersistentDrawerLeft() {
   const theme = useTheme();
-  const open = useSelector(map_open), 
+  const open = useSelector(map_open),
+        drawer = useSelector(map_drawer), 
         dispatch = useDispatch()
 
   const handleDrawerOpen = () => {
@@ -117,7 +120,7 @@ export default function PersistentDrawerLeft() {
           <Typography variant="h6" noWrap component="div">
             KURO LIST
           </Typography>
-          <SearchBar />
+          {(drawer === "Mangas") ? <SearchBar /> : '' }
         </Toolbar>
       </AppBar>
       <Drawer
@@ -141,7 +144,7 @@ export default function PersistentDrawerLeft() {
         <Divider />
         <List>
           {['Mangas', 'Lists'].map((text, index) => (
-            <ListItem key={text} disablePadding>
+            <ListItem key={text} onClick={(ev)=>dispatch(uiActions.set_drawer(ev.target.textContent))} disablePadding >
               <ListItemButton>
                 <ListItemIcon>
                   {index % 2 === 0 ? <AutoStoriesIcon /> : <ListIcon />}
@@ -154,9 +157,14 @@ export default function PersistentDrawerLeft() {
       </Drawer>
       <Main open={open} sx={{height: '100%'}}>
         <DrawerHeader />
-        {<GridMangas/>}
-
-
+        {(drawer === "Mangas") ?
+          <>
+            <PaginationRounded/>
+            <GridMangas/>
+          </>
+          :
+          <GridLists/>
+        }
       </Main>
     </Box>
   );

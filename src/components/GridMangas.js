@@ -25,8 +25,8 @@ export default function MangasGrid() {
     <Box sx={{ flexGrow: 1 }} height='100%'>
       <Grid container spacing={{ xs: 1, md: 1, xl: 2 }}>
         {mangas.map((manga, index) => (
-          <Grid key={index} width={'205px'} flexWrap='wrap'>
-            <Item alignContent='center'>
+          <Grid key={index} width={'192px'} flexWrap='wrap'>
+            <Item>
               <Card manga={manga}/>
             </Item>
           </Grid>
