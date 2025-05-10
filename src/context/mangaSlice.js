@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from 'axios';
 
-// import { excludedTagIDs } from "../request_params";
+import { excludedTagIDs } from "../request_params";
 
 export const mangaSlice = createSlice({
   name: 'manga',
@@ -38,20 +38,7 @@ export const mangaActions = mangaSlice.actions
 export default mangaSlice.reducer;
 
 export const find_mangas = (pagination={limit:48, offset:0}, title=false) => async (dispatch) => {
-  const excludedTagNames = [
-    "Genderswap","Loli","Boys' Love",
-    "Incest","Reverse Harem",
-    "Post-Apocalyptic","Sexual Violence",
-    "Crossdressing","Girls' Love","Harem",
-    "Wuxia","Doujinshi",
-    "Shota","Gyaru"];
-
-  const tags = await axios(`https://api.mangadex.org/manga/tag`);
-
-  const excludedTagIDs = tags.data.data
-    .filter(tag => excludedTagNames.includes(tag.attributes.name.en))
-    .map(tag => tag.id);
-  
+    
   const resp = await axios({
     method: 'GET',
     url: 'https://api.mangadex.org/manga',
