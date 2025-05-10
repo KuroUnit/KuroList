@@ -21,16 +21,16 @@ import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 
 import SearchBar from './Search';
 import GridMangas from './GridMangas';
-import GridLists from './GridLists'
+import GridLists from './GridLists';
 
 import { useSelector, useDispatch } from 'react-redux';
-import { map_drawer, map_open, uiActions } from '../context/uiSlice';
-import PaginationRounded from './Pagination'
+import { map_drawer, map_drawer_open, uiActions } from '../context/uiSlice';
+import PaginationRounded from './Pagination';
 
 const drawerWidth = 240;
 
-const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
-  ({ theme }) => ({
+const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'drawer_open' })(
+  ({ theme, drawer_open }) => ({
     flexGrow: 1,
     padding: theme.spacing(3),
     transition: theme.transitions.create('margin', {
@@ -38,70 +38,59 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
       duration: theme.transitions.duration.leavingScreen,
     }),
     marginLeft: `-${drawerWidth}px`,
-    variants: [
-      {
-        props: ({ open }) => open,
-        style: {
-          transition: theme.transitions.create('margin', {
-            easing: theme.transitions.easing.easeOut,
-            duration: theme.transitions.duration.enteringScreen,
-          }),
-          marginLeft: 0,
-        },
-      },
-    ],
+    ...(drawer_open && {
+      transition: theme.transitions.create('margin', {
+        easing: theme.transitions.easing.easeOut,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+      marginLeft: 0,
+    }),
   }),
 );
 
 const AppBar = styled(MuiAppBar, {
-  shouldForwardProp: (prop) => prop !== 'open',
-})(({ theme }) => ({
+  shouldForwardProp: (prop) => prop !== 'drawer_open',
+})(({ theme, drawer_open }) => ({
   transition: theme.transitions.create(['margin', 'width'], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  variants: [
-    {
-      props: ({ open }) => open,
-      style: {
-        width: `calc(100% - ${drawerWidth}px)`,
-        marginLeft: `${drawerWidth}px`,
-        transition: theme.transitions.create(['margin', 'width'], {
-          easing: theme.transitions.easing.easeOut,
-          duration: theme.transitions.duration.enteringScreen,
-        }),
-      },
-    },
-  ],
+  ...(drawer_open && {
+    width: `calc(100% - ${drawerWidth}px)`,
+    marginLeft: `${drawerWidth}px`,
+    transition: theme.transitions.create(['margin', 'width'], {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  }),
 }));
 
 const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
   ...theme.mixins.toolbar,
   justifyContent: 'flex-end',
 }));
 
 export default function PersistentDrawerLeft() {
   const theme = useTheme();
-  const open = useSelector(map_open),
-        drawer = useSelector(map_drawer), 
-        dispatch = useDispatch()
+  const drawer_open = useSelector(map_drawer_open),
+        drawer = useSelector(map_drawer),
+        dispatch = useDispatch();
 
   const handleDrawerOpen = () => {
-    dispatch(uiActions.set_open(true));
+    dispatch(uiActions.set_drawer_open(true));
   };
 
   const handleDrawerClose = () => {
-    dispatch(uiActions.set_open(false));
+    dispatch(uiActions.set_drawer_open(false));
   };
 
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
-      <AppBar position="fixed" open={open}>
+      <AppBar position="fixed" drawer_open={drawer_open}>
         <Toolbar>
           <IconButton
             color="inherit"
@@ -112,7 +101,7 @@ export default function PersistentDrawerLeft() {
               {
                 mr: 2,
               },
-              open && { display: 'none' },
+              drawer_open && { display: 'none' },
             ]}
           >
             <MenuIcon />
@@ -120,7 +109,7 @@ export default function PersistentDrawerLeft() {
           <Typography variant="h6" noWrap component="div">
             KURO LIST
           </Typography>
-          {(drawer === "Mangas") ? <SearchBar /> : '' }
+          {drawer === 'Mangas' ? <SearchBar /> : ''}
         </Toolbar>
       </AppBar>
       <Drawer
@@ -134,7 +123,7 @@ export default function PersistentDrawerLeft() {
         }}
         variant="persistent"
         anchor="left"
-        open={open}
+        open={drawer_open}
       >
         <DrawerHeader>
           <IconButton onClick={handleDrawerClose}>
@@ -144,7 +133,7 @@ export default function PersistentDrawerLeft() {
         <Divider />
         <List>
           {['Mangas', 'Lists'].map((text, index) => (
-            <ListItem key={text} onClick={(ev)=>dispatch(uiActions.set_drawer(ev.target.textContent))} disablePadding >
+            <ListItem key={text} onClick={(ev) => dispatch(uiActions.set_drawer(ev.target.textContent))} disablePadding>
               <ListItemButton>
                 <ListItemIcon>
                   {index % 2 === 0 ? <AutoStoriesIcon /> : <ListIcon />}
@@ -155,16 +144,16 @@ export default function PersistentDrawerLeft() {
           ))}
         </List>
       </Drawer>
-      <Main open={open} sx={{height: '100%'}}>
+      <Main drawer_open={drawer_open} sx={{ height: '100%' }}>
         <DrawerHeader />
-        {(drawer === "Mangas") ?
+        {drawer === 'Mangas' ? (
           <>
-            <PaginationRounded/>
-            <GridMangas/>
+            <PaginationRounded />
+            <GridMangas />
           </>
-          :
-          <GridLists/>
-        }
+        ) : (
+          <GridLists />
+        )}
       </Main>
     </Box>
   );
