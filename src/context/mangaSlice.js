@@ -5,7 +5,16 @@ import { excludedTagIDs } from "../request_params";
 
 export const mangaSlice = createSlice({
   name: 'manga',
-  initialState: {mangas: [], pagination: {limit: 48, offset: 0}, search:'', total: 10000},
+  initialState: {
+    mangas: [], 
+    pagination: 
+    {
+      limit: 48, 
+      offset: 0
+    },
+    search:'', 
+    total: 10000
+  },
   reducers: {
     set_mangas: (state, action) => {
       state.mangas = action.payload

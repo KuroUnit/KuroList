@@ -45,21 +45,10 @@ export default function MangasGrid() {
           Manga added successfully
         </Alert>
       )}
-      <Box 
-        sx={{
-          display: 'flex', 
-          flexDirection: 'column',
-          justifyContent: 'center'
-        }}>
+      <Box>
         <PaginationRounded />
 
-        <Box 
-          sx={{ 
-            display: 'flex', 
-            flexWrap: 'wrap', 
-            width: 'fit-content'
-          }}
-        >
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', }}>
           {mangas.map((manga, index) => (
             <Box key={index} sx={{ width: 192,  m:1}}>
               <Item>

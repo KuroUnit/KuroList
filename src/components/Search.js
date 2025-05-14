@@ -3,8 +3,8 @@ import { styled, alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import InputBase from '@mui/material/InputBase';
 import SearchIcon from '@mui/icons-material/Search';
-import { mangaActions } from '../context/mangaSlice';
-import { useDispatch } from 'react-redux';
+import { mangaActions, map_search } from '../context/mangaSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -51,22 +51,22 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 
 export default function SearchBar() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch(),
+        search = useSelector(map_search)
   
   const handleSearch = (ev) => {
-    dispatch(mangaActions.set_search(ev.target.value));
-    dispatch(mangaActions.set_pagination({ offset: 0 }));
-  };
-  
-  const handleClear = () => {
-    dispatch(mangaActions.set_search(''));
+    let value = ev.target.value.trim()
+    if (value !== search){
+      if(value === '') dispatch(mangaActions.set_search(''));
+      else dispatch(mangaActions.set_search(value));
+    }
     dispatch(mangaActions.set_pagination({ offset: 0 }));
   };
   
   
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <Search onKeyUp={(ev) => (ev.target.value !== '') ? handleSearch(ev) : handleClear()}>
+      <Search onChange={ev=>handleSearch(ev)}>
         <SearchIconWrapper>
           <SearchIcon />
         </SearchIconWrapper>

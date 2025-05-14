@@ -9,8 +9,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { listActions, map_selected_list, map_lists, map_current_list } from '../context/listSlice';
-import { TextField, Tooltip, Typography } from '@mui/material';
-import { map_open_create_list, map_open_list, uiActions } from '../context/uiSlice';
+import { Alert, TextField, Tooltip, Typography } from '@mui/material';
+import { map_alert, map_open_create_list, map_open_list, uiActions } from '../context/uiSlice';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: '#050505',
@@ -38,7 +38,17 @@ export default function ResponsiveGrid() {
         selectedList = useSelector(map_selected_list),
         currentList = useSelector(map_current_list),
         openList = useSelector(map_open_list),
-        openCreateList = useSelector(map_open_create_list)
+        openCreateList = useSelector(map_open_create_list),
+        alert = useSelector(map_alert)
+        
+  React.useEffect(() => {
+    if(alert){
+      const timer_id = setTimeout(() => {
+        dispatch(uiActions.set_alert(false))
+      }, (3000));
+      return () => clearTimeout(timer_id);
+    }
+  })
 
   const handleOpenList = (list) => {
     dispatch(listActions.set_selected_list(list.id));
@@ -72,6 +82,9 @@ export default function ResponsiveGrid() {
     const newList = { id: Date.now(), name: currentList, mangas: [] };
     dispatch(listActions.clear_current_list())
     dispatch(listActions.set_list(newList));
+    if(lists.find(list => list.id === newList.id)){
+    }
+    dispatch(uiActions.set_alert(true))
     dispatch(uiActions.close_create_list())
   };
 
@@ -79,6 +92,15 @@ export default function ResponsiveGrid() {
 
   return (
     <Box sx={{ flexGrow: 1, minHeight: '84vh' }}>
+      {alert && (
+        <Alert
+          severity="success"
+          onClose={() => dispatch(uiActions.set_alert(false))}
+          sx={{ mb: 2, mt: 2, borderRadius: 10 }}
+        >
+           List created successfully
+        </Alert>
+      )}
       <Button variant="contained" sx={{marginBottom: '10px'}} onClick={()=>dispatch(uiActions.open_create_list())}>Create New List</Button>
       <Modal open={openCreateList} onClose={()=>dispatch(uiActions.close_create_list())}>
         <Box sx={{
@@ -127,7 +149,7 @@ export default function ResponsiveGrid() {
               :
                 list.mangas.slice(0, 3).map(manga => (
                   <Box key={manga.id} sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <img src={manga.coverUrl} alt={manga.title} style={{ width: 50, height: 75, objectFit: 'cover', borderRadius: 4, marginRight: 8 }} />
+                    <img src={manga.coverUrl} alt={manga.title+" Image"} style={{ width: 50, height: 75, objectFit: 'cover', borderRadius: 4, marginRight: 8 }} />
                     <Typography variant="body2" noWrap>{manga.title}</Typography>
                   </Box>
                 )

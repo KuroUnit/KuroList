@@ -16,13 +16,12 @@ import MenuItem from '@mui/material/MenuItem';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { listActions, map_lists } from '../context/listSlice';
-import { map_alert, uiActions } from '../context/uiSlice';
+import { uiActions } from '../context/uiSlice';
 
 export default function Card({ manga }) {
   const [open, setOpen] = React.useState(false),
         [selectedList, setSelectedList] = React.useState({name: '', id: 0}),
         lists =  useSelector(map_lists),
-        alert = useSelector(map_alert),
         dispatch = useDispatch()
 
   const handleOpen = () => setOpen(true);
@@ -34,14 +33,10 @@ export default function Card({ manga }) {
   const handleConfirm = (listId, manga) => {
     dispatch(listActions.set_manga_to_list({listId: listId, newManga: manga}))
     if(lists.find(list=> list.id === listId)){
+      dispatch(uiActions.set_alert(true))
     }
-    dispatch(uiActions.set_alert(true))
     handleClose();
   };
-
-  React.useEffect(() => {
-    console.log('alert mudou para:', alert);
-  }, [alert]);
 
   return (
     <Box sx={{ borderRadius: '8px' }}>
@@ -70,7 +65,7 @@ export default function Card({ manga }) {
       <Box sx={{ width: '100%', height: 250 }}>
         <img
           src={manga.coverUrl}
-          alt="Imagem"
+          alt={manga.title+" Image"}
           style={{
             width: '100%',
             height: '100%',
