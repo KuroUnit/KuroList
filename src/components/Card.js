@@ -15,13 +15,15 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { listAction, map_lists } from '../context/listSlice';
+import { listActions, map_lists } from '../context/listSlice';
+import { map_alert, uiActions } from '../context/uiSlice';
 
 export default function Card({ manga }) {
-  const [open, setOpen] = React.useState(false);
-  const [selectedList, setSelectedList] = React.useState({name: '', id: 0}),
-  lists =  useSelector(map_lists),
-  dispatch = useDispatch()
+  const [open, setOpen] = React.useState(false),
+        [selectedList, setSelectedList] = React.useState({name: '', id: 0}),
+        lists =  useSelector(map_lists),
+        alert = useSelector(map_alert),
+        dispatch = useDispatch()
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
@@ -30,10 +32,16 @@ export default function Card({ manga }) {
   };
 
   const handleConfirm = (listId, manga) => {
-    dispatch(listAction.set_manga_to_list({listId: listId, newManga: manga}))
+    dispatch(listActions.set_manga_to_list({listId: listId, newManga: manga}))
+    if(lists.find(list=> list.id === listId)){
+    }
+    dispatch(uiActions.set_alert(true))
     handleClose();
   };
 
+  React.useEffect(() => {
+    console.log('alert mudou para:', alert);
+  }, [alert]);
 
   return (
     <Box sx={{ borderRadius: '8px' }}>
@@ -82,6 +90,7 @@ export default function Card({ manga }) {
               labelId="select-lista-label"
               value={selectedList.name}
               label="Choose the list"
+              sx={{width:160}}
               onChange={(e) => setSelectedList({name: e.target.value, id: e.explicitOriginalTarget.id})}
             >
               {lists.map((list) => (

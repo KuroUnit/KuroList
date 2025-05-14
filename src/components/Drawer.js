@@ -25,7 +25,6 @@ import GridLists from './GridLists';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { map_drawer, map_drawer_open, uiActions } from '../context/uiSlice';
-import PaginationRounded from './Pagination';
 
 const drawerWidth = 240;
 
@@ -146,14 +145,7 @@ export default function PersistentDrawerLeft() {
       </Drawer>
       <Main drawer_open={drawer_open} sx={{ height: '100%' }}>
         <DrawerHeader />
-        {drawer === 'Mangas' ? (
-          <>
-            <PaginationRounded />
-            <GridMangas />
-          </>
-        ) : (
-          <GridLists />
-        )}
+        {drawer === 'Mangas' ? <GridMangas /> : <GridLists />}
       </Main>
     </Box>
   );

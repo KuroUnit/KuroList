@@ -2,11 +2,13 @@ import * as React from 'react';
 import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
-import Grid from '@mui/material/Grid';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import Card from './Card';
 import { map_mangas } from '../context/mangaSlice';
+import { Alert } from '@mui/material';
+import { map_alert, uiActions } from '../context/uiSlice';
+import PaginationRounded from './Pagination';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: '#050505',
@@ -20,18 +22,54 @@ const Item = styled(Paper)(({ theme }) => ({
 
 
 export default function MangasGrid() {
-  const mangas = useSelector(map_mangas)
+  const dispatch = useDispatch(),
+        mangas = useSelector(map_mangas),
+        alert = useSelector(map_alert)
+
+  React.useEffect(() => {
+    if(alert){
+      const timer_id = setTimeout(() => {
+        dispatch(uiActions.set_alert(false))
+      }, (3000));
+      return () => clearTimeout(timer_id);
+    }
+  })
   return (
     <Box sx={{ flexGrow: 1 }} height='100%'>
-      <Grid container spacing={{ xs: 1, md: 1, xl: 2 }}>
-        {mangas.map((manga, index) => (
-          <Grid key={index} width={'192px'} flexWrap='wrap'>
-            <Item>
-              <Card manga={manga}/>
-            </Item>
-          </Grid>
-        ))}
-      </Grid>
+      {alert && (
+        <Alert
+          severity="success"
+          onClose={() => dispatch(uiActions.set_alert(false))}
+          sx={{ mb: 2, mt: 2, borderRadius: 10 }}
+        >
+          Manga added successfully
+        </Alert>
+      )}
+      <Box 
+        sx={{
+          display: 'flex', 
+          flexDirection: 'column',
+          justifyContent: 'center'
+        }}>
+        <PaginationRounded />
+
+        <Box 
+          sx={{ 
+            display: 'flex', 
+            flexWrap: 'wrap', 
+            width: 'fit-content'
+          }}
+        >
+          {mangas.map((manga, index) => (
+            <Box key={index} sx={{ width: 192,  m:1}}>
+              <Item>
+                <Card manga={manga} />
+              </Item>
+            </Box>
+          ))}
+
+        </Box>
+      </Box>
     </Box>
     
   );

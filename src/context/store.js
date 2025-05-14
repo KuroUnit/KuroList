@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
-import mangaReducer from '../context/mangaSlice'
-import uiReducer from '../context/uiSlice'
-import listReducer from '../context/listSlice'
+import mangaReducer from './mangaSlice'
+import uiReducer from './uiSlice'
+import listReducer from './listSlice'
 
 
 export const store = configureStore({

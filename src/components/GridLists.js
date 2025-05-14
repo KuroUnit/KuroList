@@ -8,8 +8,9 @@ import Modal from '@mui/material/Modal';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { listAction, map_current_list, map_lists } from '../context/listSlice';
+import { listActions, map_selected_list, map_lists, map_current_list } from '../context/listSlice';
 import { TextField, Tooltip, Typography } from '@mui/material';
+import { map_open_create_list, map_open_list, uiActions } from '../context/uiSlice';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: '#050505',
@@ -32,45 +33,54 @@ const style = {
 };
 
 export default function ResponsiveGrid() {
-  const dispatch = useDispatch();
-  const lists = useSelector(map_lists);
-  const selectedList = useSelector(map_current_list);
-  const [openList, setOpenList] = React.useState(false);
-  const [currentList, setCurrentList] = React.useState('');
-  const [openCreateList, setOpenCreateList] = React.useState(false);
+  const dispatch = useDispatch(),
+        lists = useSelector(map_lists),
+        selectedList = useSelector(map_selected_list),
+        currentList = useSelector(map_current_list),
+        openList = useSelector(map_open_list),
+        openCreateList = useSelector(map_open_create_list)
 
   const handleOpenList = (list) => {
-    dispatch(listAction.set_current_list(list));
-    setOpenList(true);
+    dispatch(listActions.set_selected_list(list.id));
+    dispatch(uiActions.open_list());
   };
   
   const handleCloseList = () => {
-    setOpenList(false);
-    dispatch(listAction.clear_current_list());
+    dispatch(uiActions.close_list());
+    dispatch(listActions.clear_selected_list());
   };  
 
   const handleDeleteManga = (mangaId) => {
     if (selectedList) {
-      dispatch(listAction.del_manga_from_list({ listId: selectedList.id, mangaId }));
+      dispatch(listActions.del_manga_from_list({ listId: selectedList.id, mangaId }));
+      updateList(selectedList.id)
+      console.log(selectedList)
     }
   };
+  const updateList = (listId) => {
+    dispatch(listActions.set_selected_list(listId))
+  }
   const handleDeleteList = (listId) => {
-    dispatch(listAction.del_list(listId));
+    dispatch(listActions.del_list(listId));
+    if (selectedList?.id === listId){
+      dispatch(uiActions.close_list())
+      dispatch(listActions.clear_selected_list())
+    }
   };  
 
   const handleCreateList = () => {
     const newList = { id: Date.now(), name: currentList, mangas: [] };
-    setCurrentList('')
-    dispatch(listAction.set_list(newList));
-    setOpenCreateList(false);
+    dispatch(listActions.clear_current_list())
+    dispatch(listActions.set_list(newList));
+    dispatch(uiActions.close_create_list())
   };
 
   
 
   return (
     <Box sx={{ flexGrow: 1, minHeight: '84vh' }}>
-      <Button variant="contained" sx={{marginBottom: '10px'}} onClick={()=>setOpenCreateList(true)}>Create New List</Button>
-      <Modal open={openCreateList} onClose={()=>setOpenCreateList(false)}>
+      <Button variant="contained" sx={{marginBottom: '10px'}} onClick={()=>dispatch(uiActions.open_create_list())}>Create New List</Button>
+      <Modal open={openCreateList} onClose={()=>dispatch(uiActions.close_create_list())}>
         <Box sx={{
           position: 'absolute',
           top: '50%',
@@ -88,7 +98,7 @@ export default function ResponsiveGrid() {
             noValidate
             autoComplete="off"
           >
-            <TextField id="standard-basic" label="List Name" variant="standard" sx={{width: '300px'}} value={currentList} onChange={(ev)=>setCurrentList(ev.target.value)}/>
+            <TextField id="standard-basic" label="List Name" variant="standard" sx={{width: '300px'}} value={currentList} onChange={(ev)=>dispatch(listActions.set_current_list(ev.target.value))}/>
             <Button variant="contained" sx={{height: '36px', marginLeft: '20px' }} onClick={()=>handleCreateList()}>Create</Button>
           </Box>
         </Box>
@@ -173,12 +183,10 @@ export default function ResponsiveGrid() {
               }
             </>
           : 
-            <Typography variant="body2" color="text.secondary">Carregando lista...</Typography>
+            <Typography variant="body2" color="text.secondary">Loading List...</Typography>
           }
         </Box>
       </Modal>
-
-
 
     </Box>
   );
