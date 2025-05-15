@@ -5,5 +5,5 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 ## Dominio Web onde a aplicação foi disponibilizada:
 [kurolist.netlify.app](https://kurolist.netlify.app)
 
-OBS.: A aplicação não funciona totalmente no servidor, visto que a api utilizada bloqueia requisição vindo de um outro domínio. O mesmo funciona via localhost, assim o erro não pode ser percebido, antes de ter sido feito o deployment no servidor, e ter sido feito uma pesquisa sobre o assunto. 
-Dessa forma, já está sendo feito uma pesquisa sobre um possível solução para o problema, para via de testes o único meio de acessar o projeto em funcionamento, é realizar um clone do repositorio e após rodar o comando `npm i` para instalar as dependências, ser startado o projeto via localhost.
+OBS.: A aplicação não funciona diretamente com a api no servidor, visto que a api utilizada bloqueia requisição vindo de domínios desconhecidos.
+Assim foi criado um servidor back-end de proxy simples, para somente realizar as requisições e passar a resposta para a aplicação principal.
