@@ -5,6 +5,8 @@ import InputBase from '@mui/material/InputBase';
 import SearchIcon from '@mui/icons-material/Search';
 import { mangaActions, map_search } from '../context/mangaSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import { errorActions, map_error } from '../context/errorSlice';
+import { Alert } from '@mui/material';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -37,7 +39,6 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   width: '100%',
   '& .MuiInputBase-input': {
     padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
     transition: theme.transitions.create('width'),
     [theme.breakpoints.up('sm')]: {
@@ -52,27 +53,52 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 export default function SearchBar() {
   const dispatch = useDispatch(),
-        search = useSelector(map_search)
+        search = useSelector(map_search),
+        error = useSelector(map_error)
+
+  React.useEffect(()=>{
+    if(error) {
+      console.log(error)
+      const timer_id = setTimeout(()=>{
+        dispatch(errorActions.set_error(null))
+      }, [5000])
+      return ()=> clearTimeout(timer_id)
+    }
+  })
   
   const handleSearch = (ev) => {
     let value = ev.target.value.trim()
     if (value !== search){
-      if(value === '') dispatch(mangaActions.set_search(''));
-      else dispatch(mangaActions.set_search(value));
+      if(value === '') {
+        dispatch(mangaActions.set_search(''));
+        dispatch(errorActions.set_error("Search field must not be empty. Enter a value!"))
+      }
+      else {
+        dispatch(mangaActions.set_search(value));
+        dispatch(errorActions.set_error(null))
+      }
     }
     dispatch(mangaActions.set_pagination({ offset: 0 }));
   };
   
   
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <Search onChange={ev=>handleSearch(ev)}>
+    <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'flex-end'}}>
+      {error &&
+        <Alert severity='error'>{error}</Alert>
+      }
+      <Search 
+        onChange={ev=>handleSearch(ev)} 
+        onFocus={ev => ev.target.value === '' && dispatch(errorActions.set_error("Search field must not be empty. Enter a value!"))}
+        onBlur={ev => ev.target.value === '' && dispatch(errorActions.set_error(null))}
+      >
         <SearchIconWrapper>
           <SearchIcon />
         </SearchIconWrapper>
         <StyledInputBase
           placeholder="Search…"
           inputProps={{ 'aria-label': 'search' }}
+          sx={{height:50}}
         />
       </Search>
     </Box>

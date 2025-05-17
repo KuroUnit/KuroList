@@ -49,7 +49,7 @@ const BACKEND_PROXY_BASE_URL = 'https://backend-proxy-mdex.onrender.com'
 
 export const find_mangas = (pagination = { limit: 48, offset: 0 }, title = false) => async (dispatch) => {
   try {
-    const proxyUrl = `${BACKEND_PROXY_BASE_URL}/api/manga-proxy`;;
+    const proxyUrl = `${BACKEND_PROXY_BASE_URL}/api/manga-proxy`;
 
     const resp = await axios({
       method: 'GET',
