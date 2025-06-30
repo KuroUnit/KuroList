@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import './App.css';
 
 import Drawer from './components/Drawer';
+import LoginPage from './components/LoginPage'
 
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 
