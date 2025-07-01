@@ -1,29 +1,26 @@
 import * as React from 'react';
-import { styled, useTheme } from '@mui/material/styles';
-import Box from '@mui/material/Box';
-import Drawer from '@mui/material/Drawer';
-import CssBaseline from '@mui/material/CssBaseline';
-import MuiAppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import List from '@mui/material/List';
-import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
+import { 
+  Box, List, Drawer, Typography, Divider, Tooltip,
+  CssBaseline, AppBar as MuiAppBar, Toolbar, IconButton, 
+  ListItem, ListItemButton, ListItemIcon, ListItemText 
+} from '@mui/material';
+
+import { styled, useTheme } from '@mui/material/styles'
+
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
 import ListIcon from '@mui/icons-material/List';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 import SearchBar from './Search';
 import GridMangas from './GridMangas';
 import GridLists from './GridLists';
 
 import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { authActions } from '../context/authSlice';
 import { map_drawer, map_drawer_open, uiActions } from '../context/uiSlice';
 
 const drawerWidth = 240;
@@ -74,9 +71,11 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
 export default function PersistentDrawerLeft() {
   const theme = useTheme();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const drawer_open = useSelector(map_drawer_open),
-        drawer = useSelector(map_drawer),
-        dispatch = useDispatch();
+        drawer = useSelector(map_drawer);
 
   const handleDrawerOpen = () => {
     dispatch(uiActions.set_drawer_open(true));
@@ -84,6 +83,11 @@ export default function PersistentDrawerLeft() {
 
   const handleDrawerClose = () => {
     dispatch(uiActions.set_drawer_open(false));
+  };
+
+  const handleLogout = () => {
+    dispatch(authActions.logout());
+    navigate('/login');
   };
 
   return (
@@ -96,12 +100,7 @@ export default function PersistentDrawerLeft() {
             aria-label="open drawer"
             onClick={handleDrawerOpen}
             edge="start"
-            sx={[
-              {
-                mr: 2,
-              },
-              drawer_open && { display: 'none' },
-            ]}
+            sx={[{mr: 2,}, drawer_open && { display: 'none' }]}
           >
             <MenuIcon />
           </IconButton>
@@ -109,6 +108,11 @@ export default function PersistentDrawerLeft() {
             KURO LIST
           </Typography>
           {drawer === 'Mangas' ? <SearchBar /> : ''}
+          <Tooltip title="Logout" sx={{ marginLeft: 3 }}>
+            <IconButton color="inherit" onClick={handleLogout}>
+              <LogoutIcon />
+            </IconButton>
+          </Tooltip>
         </Toolbar>
       </AppBar>
       <Drawer

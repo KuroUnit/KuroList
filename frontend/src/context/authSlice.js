@@ -1,7 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import axios from 'axios';
-
-const API_BASE_URL = 'http://localhost:3002/api'
+import apiClient from '../axiosConfig';
 
 export const authSlice = createSlice({
   name: 'auth',
@@ -47,11 +45,7 @@ export const login_user = ({ login, password }) => async (dispatch) => {
   try {
     if (login)
     dispatch(authActions.set_loading());
-    const apiUrl = `${API_BASE_URL}/auth/login`;
-    const response = await axios.post(
-      apiUrl,
-      { login, password }
-    );
+    const response = await apiClient.post("/auth/login", { login, password });
 
     localStorage.setItem('token', `Bearer ${response.data.token}`);
     

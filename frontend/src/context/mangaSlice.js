@@ -1,7 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import axios from 'axios';
-
-const API_BASE_URL = 'http://localhost:3002/api';
+import apiClient from '../axiosConfig';
 
 export const mangaSlice = createSlice({
   name: 'manga',
@@ -55,8 +53,6 @@ export const find_mangas = (pagination = { limit: 48, offset: 0 }, title = false
       return;
     }
 
-    const apiUrl = `${API_BASE_URL}/mangas/search`;
-
     const params = {
       limit: pagination.limit,
       offset: pagination.offset,
@@ -65,10 +61,8 @@ export const find_mangas = (pagination = { limit: 48, offset: 0 }, title = false
       params.title = title;
     }
 
-    const response = await axios.get(apiUrl, {
-      headers: {
-        'Authorization': token
-      },
+    const response = await apiClient.get("/mangas/search", {
+      headers: {'Authorization': token},
       params: params
     });
 

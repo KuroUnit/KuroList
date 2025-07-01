@@ -5,6 +5,9 @@ import { store } from './context/store';
 import App from './App';
 import './index.css';
 
+import { setInterceptors } from './axiosConfig';
+setInterceptors(store);
+
 const container = document.getElementById('root');
 const root = createRoot(container);
 

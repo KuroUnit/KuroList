@@ -1,7 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
-import axios from 'axios';
+import apiClient from '../axiosConfig';
 
-const API_BASE_URL = 'http://localhost:3002/api';
 
 export const listSlice = createSlice({
   name: 'list',
@@ -68,7 +67,7 @@ export const get_lists = () => async (dispatch, getState) => {
   try {
     const token = getState().auth.token;
 
-    const response = await axios.get(`${API_BASE_URL}/lists`, {
+    const response = await apiClient.get(`/lists`, {
       headers: { 'Authorization': token },
     });
 
@@ -86,7 +85,7 @@ export const create_list = (listData) => async (dispatch, getState) => {
   try {
     const token = getState().auth.token;
 
-    const response = await axios.post(`${API_BASE_URL}/lists`, listData, {
+    const response = await apiClient.post(`/lists`, listData, {
       headers: { 'Authorization': token },
     });
     
