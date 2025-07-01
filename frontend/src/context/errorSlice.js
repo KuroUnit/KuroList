@@ -10,7 +10,6 @@ export const errorSlice = createSlice({
       state.error = action.payload
       return state; 
     },
-
   }
 });
 export const map_error = (state) => state.error.error

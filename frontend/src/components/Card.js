@@ -15,27 +15,28 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { listActions, map_lists } from '../context/listSlice';
+import { listActions, map_all_lists } from '../context/listSlice';
 import { uiActions } from '../context/uiSlice';
 
 export default function Card({ manga }) {
   const [open, setOpen] = React.useState(false),
         [selectedList, setSelectedList] = React.useState({name: '', id: 0}),
-        lists =  useSelector(map_lists),
+        lists =  useSelector(map_all_lists),
         dispatch = useDispatch()
 
   const handleOpen = () => setOpen(true);
+
   const handleClose = () => {
     setSelectedList('');
     setOpen(false);
   };
 
   const handleConfirm = (listId, manga) => {
-    dispatch(listActions.set_manga_to_list({listId: listId, newManga: manga}))
-    if(lists.find(list=> list.id === listId)){
-      dispatch(uiActions.set_alert(true))
-    }
-    handleClose();
+    // dispatch(listActions.set_manga_to_list({listId: listId, newManga: manga}))
+    // if(lists.find(list=> list.id === listId)){
+    //   dispatch(uiActions.set_alert(true))
+    // }
+    // handleClose();
   };
 
   return (

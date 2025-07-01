@@ -1,19 +1,17 @@
 import * as React from 'react';
-import { styled, alpha } from '@mui/material/styles';
-import Box from '@mui/material/Box';
-import InputBase from '@mui/material/InputBase';
+import { Alert, InputBase, Box, styled, alpha } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+
 import { mangaActions, map_search } from '../context/mangaSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { errorActions, map_error } from '../context/errorSlice';
-import { Alert } from '@mui/material';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
   borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
+  backgroundColor: alpha(theme.palette.common.white, 0.85),
   '&:hover': {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
+    backgroundColor: alpha(theme.palette.common.white, 0.48),
   },
   marginLeft: 0,
   width: '100%',

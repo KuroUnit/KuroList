@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from 'axios';
 
-import { excludedTagIDs } from "../excluded_tags_ids"; 
+const API_BASE_URL = 'http://localhost:3002/api';
 
 export const mangaSlice = createSlice({
   name: 'manga',
@@ -13,7 +13,7 @@ export const mangaSlice = createSlice({
       offset: 0
     },
     search: '',
-    total: 10000
+    total: 0
   },
   reducers: {
     set_mangas: (state, action) => {
@@ -45,50 +45,41 @@ export const mangaActions = mangaSlice.actions;
 
 export default mangaSlice.reducer;
 
-const BACKEND_PROXY_BASE_URL = 'https://backend-proxy-mdex.onrender.com'
 
-export const find_mangas = (pagination = { limit: 48, offset: 0 }, title = false) => async (dispatch) => {
+export const find_mangas = (pagination = { limit: 48, offset: 0 }, title = false) => async (dispatch, getState) => {
   try {
-    const proxyUrl = `${BACKEND_PROXY_BASE_URL}/api/manga-proxy`;
+    const token = getState().auth.token;
 
-    const resp = await axios({
-      method: 'GET',
-      url: proxyUrl,
-      params: {
-        'limit': pagination.limit,
-        'offset': pagination.offset,
-        'excludedTags[]': excludedTagIDs,
-        'contentRating[]': ['safe'],
-        'includes[]': ['cover_art'],
-        ...(title && { 'title': title })
-      }
+    if (!token) {
+      console.error("Tentativa de buscar mangás sem token.");
+      return;
+    }
+
+    const apiUrl = `${API_BASE_URL}/mangas/search`;
+
+    const params = {
+      limit: pagination.limit,
+      offset: pagination.offset,
+    };
+    if (title) {
+      params.title = title;
+    }
+
+    const response = await axios.get(apiUrl, {
+      headers: {
+        'Authorization': token
+      },
+      params: params
     });
-    const api_response = resp.data;
+
+    const api_response = response.data;
 
     // Definido dessa forma por causa do limite do offset + limit da api que deve ser menor que 10000
     dispatch(mangaActions.set_total(Math.min(api_response.total, 10000)));
-
-    const mangasData = api_response.data.map((manga) => {
-      const coverRel = manga.relationships.find(rel => rel.type === 'cover_art');
-      const fileName = coverRel?.attributes?.fileName;
-
-      return {
-        id: manga.id,
-        title: manga.attributes.title.en,
-        description: manga.attributes.description.en,
-        status: manga.attributes.status,
-        year: manga.attributes.year,
-        genre: manga.attributes.tags
-          .filter((tag) => tag.attributes.group === 'genre')
-          .map(tag => tag.attributes.name.en),
-        coverUrl: fileName
-        ? `${BACKEND_PROXY_BASE_URL}/api/image-cover-proxy?mangaId=${manga.id}&fileName=${encodeURIComponent(fileName)}`
-        : null
-      };
-    });
-    dispatch(mangaActions.set_mangas(mangasData));
+    // Despachando os dados recebidos
+    dispatch(mangaActions.set_mangas(api_response.mangas));
 
   } catch (error) {
-    console.error("Erro ao buscar mangas via proxy:", error.response ? error.response.data : error.message)
+    console.error("Erro ao buscar mangas na API:", error.response ? error.response.data : error.message)
   }
 };

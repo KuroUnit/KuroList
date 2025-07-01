@@ -1,13 +1,9 @@
-import React, { useEffect } from 'react';
-import './App.css';
-
-import Drawer from './components/Drawer';
-import LoginPage from './components/LoginPage'
-
+import React from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
-import { find_mangas, map_search,map_pagination } from './context/mangaSlice';
-import { useDispatch, useSelector } from 'react-redux';
+import LoginPage from './components/LoginPage';
+import MainApp from './MainApp';
 
 const darkTheme = createTheme({
   palette: {
@@ -15,25 +11,23 @@ const darkTheme = createTheme({
   },
 });
 
+// Componente de protegeção das rotas
+const PrivateRoute = () => {
+  const token = localStorage.getItem('token');
+  return token ? <MainApp /> : <Navigate to="/login" />;
+};
+
 function App() {
-  const dispatch = useDispatch(),
-        pagination = useSelector(map_pagination),
-        search = useSelector(map_search)
-  
-
-  useEffect(() => {
-    const timer_id = setTimeout(() => {
-      dispatch(find_mangas(pagination, search))
-    }, (10));
-    return () => clearTimeout(timer_id);
-  }, [dispatch, pagination, search]);
-
   return (
     <ThemeProvider theme={darkTheme}>
-      <Drawer />
+      <Router>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/*" element={<PrivateRoute />} />
+        </Routes>
+      </Router>
     </ThemeProvider>
-  )
+  );
 }
 
 export default App;
-

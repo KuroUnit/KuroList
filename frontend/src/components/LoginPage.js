@@ -1,15 +1,51 @@
-import { useState } from "react";
+import { useState, useEffect  } from "react";
+import { useNavigate } from "react-router-dom";
 import { Box, Button, Container, TextField, Typography } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+
+import { authActions, map_error, map_loading, map_token, login_user } from '../context/authSlice';
 
 const LoginPage = () => {
-  const [login, setLogin] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [login, setLogin] = useState(""),
+        [password, setPassword] = useState(""),
+        [formError, setFormError] = useState(null);
 
-  const handleSubmit = (e) => {
-    
+  const dispatch = useDispatch(),
+        navigate = useNavigate();
+
+  const auth_error = useSelector(map_error),
+        loading = useSelector(map_loading),
+        token = useSelector(map_token);
+
+  const handleInputChange = (setter) => (ev) => {
+    setFormError(null);
+    if (auth_error){
+      dispatch(authActions.clear_error())
+    }
+    setter(ev.target.value)
+  }
+
+  const handleSubmit = async (ev) => {
+    ev.preventDefault();
+
+    setFormError(null);
+
+    if (!login.trim() || !password.trim()) {
+      setFormError("Por favor, preencha todos os campos.");
+      return;
+    }
+
+    dispatch(login_user({ login, password }))
   };
 
+  useEffect(() => {
+    if (token) {
+      navigate('/');
+    }
+  }, [token, navigate]);
+
+  const errorMessage = auth_error || formError;
+  
   return (
     <Container maxWidth="xs">
       <Box 
@@ -26,7 +62,7 @@ const LoginPage = () => {
             fullWidth
             label="Login"
             value={login}
-            onChange={(e) => setLogin(e.target.value)}
+            onChange={handleInputChange(setLogin)}
           />
           <TextField
             margin="normal"
@@ -34,13 +70,19 @@ const LoginPage = () => {
             label="Senha"
             type="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={handleInputChange(setPassword)}
           />
-          {error && (
-            <Typography color="error" variant="body2">{error}</Typography>
+          {errorMessage && (
+            <Typography color="error" variant="body2">{errorMessage}</Typography>
           )}
-          <Button type="submit" fullWidth variant="contained" sx={{ mt: 2 }}>
-            Entrar
+          <Button 
+            type="submit" 
+            fullWidth 
+            variant="contained" 
+            sx={{ mt: 2 }}
+            disabled={loading}
+          >
+            {loading ? 'Entrando...' : 'Entrar'}
           </Button>
         </Box>
       </Box>

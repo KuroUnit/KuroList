@@ -25,7 +25,22 @@ export default function PaginationRounded() {
   return (
     <Stack spacing={2} marginBottom='20px'>
       <Pagination count={totalPages} variant="outlined" shape="rounded"
-      onChange={(ev, value) => setOffset(ev, value)} />
+      onChange={(ev, value) => setOffset(ev, value)} sx={{
+          '& .MuiPaginationItem-root': {
+            color: 'rgb(255, 255, 255)',
+            borderColor: 'rgba(224, 224, 224, 0.7)',
+          },'& .MuiPaginationItem-root:hover': {
+            backgroundColor: 'rgba(116, 116, 116, 0.7)',
+          },
+          '& .MuiPaginationItem-root.Mui-selected': {
+            backgroundColor: 'rgba(224, 224, 224, 0.7)',
+            color: 'rgb(255, 255, 255)', 
+            borderColor: 'rgba(224, 224, 224, 0.7)',
+          },
+          '& .MuiPaginationItem-root.Mui-selected:hover': {
+            backgroundColor: 'rgba(116, 116, 116, 0.7)',
+          },
+        }}/>
     </Stack>
   );
 }
