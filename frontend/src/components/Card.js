@@ -1,42 +1,69 @@
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import IconButton from '@mui/material/IconButton';
-import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
-import Tooltip from '@mui/material/Tooltip';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
-import Button from '@mui/material/Button';
-import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
-
+import {useState, useEffect} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import {
+  Box, Typography, Tooltip, IconButton, Dialog, DialogTitle,
+  DialogContent, FormControl, InputLabel, Select, MenuItem,
+  DialogActions, Button, CircularProgress
+} from '@mui/material';
+
+import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
+import BrokenImageIcon from '@mui/icons-material/BrokenImage';
+
 import { listActions, map_all_lists } from '../context/listSlice';
 import { uiActions } from '../context/uiSlice';
+import { get_cover_image, mangaActions } from '../context/mangaSlice';
 
 export default function Card({ manga }) {
-  const [open, setOpen] = React.useState(false),
-        [selectedList, setSelectedList] = React.useState({name: '', id: 0}),
-        lists =  useSelector(map_all_lists),
+  const [openDialog, setOpenDialog] = useState(false),
+        [selectedList, setSelectedList] = useState(''),
+        [imageUrl, setImageUrl] = useState(null),
+        [isLoadingImage, setIsLoadingImage] = useState(true),
+        [imageError, setImageError] = useState(false);
+
+        
+  const lists =  useSelector(map_all_lists),
         dispatch = useDispatch()
 
-  const handleOpen = () => setOpen(true);
+  useEffect(() => {
+    if (!manga.id || !manga.coverFileName) {
+      setIsLoadingImage(false);
+      setImageError(true);
+      return;
+    }
 
-  const handleClose = () => {
-    setSelectedList('');
-    setOpen(false);
-  };
+    let mounted = true
 
-  const handleConfirm = (listId, manga) => {
-    // dispatch(listActions.set_manga_to_list({listId: listId, newManga: manga}))
-    // if(lists.find(list=> list.id === listId)){
-    //   dispatch(uiActions.set_alert(true))
-    // }
-    // handleClose();
+    const loadImage = async () => {
+      try {
+        const blobUrl = await dispatch(get_cover_image({mangaId: manga.id, fileName: manga.coverFileName}))
+        if (mounted) setImageUrl(blobUrl)
+        
+      } catch (error) {
+        if(mounted) setImageError(true);
+      } finally {
+        if(mounted) setIsLoadingImage(false);
+      }
+
+    }
+    loadImage();
+    // Evitando que as imagens fiquem prejudicando o desempenho da aplicação
+    return () => {
+      mounted = false
+      if (imageUrl) URL.revokeObjectURL(imageUrl);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [manga.id, manga.coverFileName, dispatch])
+
+  const handleOpenDialog = () => setOpenDialog(true);
+
+  const handleCloseDialog = () => setOpenDialog(false);
+
+  const handleConfirmSave = () => {
+    if (selectedList) {
+      dispatch(listActions.set_manga_to_list({ listId: selectedList, newManga: manga }));
+      dispatch(uiActions.set_alert(true));
+    }
+    handleCloseDialog();
   };
 
   return (
@@ -59,38 +86,35 @@ export default function Card({ manga }) {
             {manga.title}
           </Typography>
         </Tooltip>
-        <IconButton onClick={handleOpen}>
+        <IconButton onClick={handleOpenDialog}>
           <BookmarkBorderIcon />
         </IconButton>
       </Box>
-      <Box sx={{ width: '100%', height: 250 }}>
-        <img
-          src={manga.coverUrl}
-          alt={manga.title+" Image"}
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            display: 'block',
-            borderRadius: '8px'
-          }}
-        />
+
+      <Box sx={{ width: '100%', height: 250, display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: '#333', borderRadius: '8px' }}>
+        {isLoadingImage ? (
+          <CircularProgress color="inherit" />
+        ) : imageError ? (
+          <Tooltip title="Não foi possível carregar a imagem">
+            <BrokenImageIcon sx={{ color: 'text.secondary', fontSize: 40 }} />
+          </Tooltip>
+        ) : (
+          <img
+            src={imageUrl}
+            alt={manga.title + " Image"}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', borderRadius: '8px' }}
+          />
+        )}
       </Box>
 
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Salve Manga</DialogTitle>
+      <Dialog open={openDialog} onClose={handleCloseDialog}>
+        <DialogTitle>Salvar Mangá</DialogTitle>
         <DialogContent sx={{ mt: 1 }}>
           <FormControl fullWidth>
-            <InputLabel id="select-lista-label">Choose the list</InputLabel>
-            <Select
-              labelId="select-lista-label"
-              value={selectedList.name}
-              label="Choose the list"
-              sx={{width:160}}
-              onChange={(e) => setSelectedList({name: e.target.value, id: e.explicitOriginalTarget.id})}
-            >
+            <InputLabel>Escolha a lista</InputLabel>
+            <Select value={selectedList} label="Escolha a lista" onChange={(e) => setSelectedList(e.target.value)}>
               {lists.map((list) => (
-                <MenuItem id={list.id} key={list.name} value={list.name}>
+                <MenuItem key={list.id} value={list.id}>
                   {list.name}
                 </MenuItem>
               ))}
@@ -98,9 +122,9 @@ export default function Card({ manga }) {
           </FormControl>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={(e)=>handleConfirm(Number(selectedList.id), manga)} disabled={!selectedList.name} autoFocus>
-            Confirm
+          <Button onClick={handleCloseDialog}>Cancelar</Button>
+          <Button onClick={handleConfirmSave} disabled={!selectedList} autoFocus>
+            Confirmar
           </Button>
         </DialogActions>
       </Dialog>

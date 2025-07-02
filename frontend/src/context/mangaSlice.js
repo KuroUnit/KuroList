@@ -61,7 +61,7 @@ export const find_mangas = (pagination = { limit: 48, offset: 0 }, title = false
       params.title = title;
     }
 
-    const response = await apiClient.get("/mangas/search", {
+    const response = await apiClient.get("/mangas", {
       headers: {'Authorization': token},
       params: params
     });
@@ -77,3 +77,27 @@ export const find_mangas = (pagination = { limit: 48, offset: 0 }, title = false
     console.error("Erro ao buscar mangas na API:", error.response ? error.response.data : error.message)
   }
 };
+
+export const get_cover_image = ({ mangaId, fileName }) => {
+  return async (dispatch, getState) => {
+    try {
+      const token = getState().auth.token;
+
+      if (!token) {
+        throw new Error("Tentativa de buscar a capa do mangá sem token.");
+      }
+      
+      const response = await apiClient.get(
+        `/mangas/cover?mangaId=${mangaId}&fileName=${fileName}`,
+        {
+          headers: { 'Authorization': token },
+          responseType: 'blob', // Definindo o tipo de conteúdo esperado
+        }
+      );
+      return URL.createObjectURL(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar a capa de um manga na API:", error.response ? error.response.data : error.message)
+      throw error
+    }
+  }
+}
