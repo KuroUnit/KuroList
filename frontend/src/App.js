@@ -11,10 +11,10 @@ const darkTheme = createTheme({
   },
 });
 
-// Componente de protegeção das rotas
-const PrivateRoute = () => {
+// Componente de redirecionamento
+const RedirectRoute = () => {
   const token = localStorage.getItem('token');
-  return token ? <MainApp /> : <Navigate to="/login" />;
+  return token ? <Navigate to="/" /> : <Navigate to="/login" />;
 };
 
 function App() {
@@ -23,7 +23,8 @@ function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/*" element={<PrivateRoute />} />
+          <Route path="/" element={<MainApp />} />
+          <Route path="/*" element={<RedirectRoute />} />
         </Routes>
       </Router>
     </ThemeProvider>

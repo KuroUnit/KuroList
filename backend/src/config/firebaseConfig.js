@@ -1,5 +1,5 @@
 import admin from 'firebase-admin';
-import {getFirestore} from 'firebase-admin/firestore';
+import {getFirestore, FieldValue} from 'firebase-admin/firestore';
 import dotenv from 'dotenv';
 
 import serviceAccount from './firebase-credentials.json' with { type: 'json' };
@@ -19,3 +19,4 @@ if (admin.apps.length === 0) {
 }
 
 export const db = getFirestore();
+export { FieldValue }

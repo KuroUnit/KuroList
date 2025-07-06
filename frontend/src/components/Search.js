@@ -86,7 +86,7 @@ export default function SearchBar() {
         <Alert severity='error'>{error}</Alert>
       }
       <Search 
-        onChange={ev=>handleSearch(ev)} 
+        onKeyDown={ev => (ev.key === 'Enter') ? handleSearch(ev) : ''} 
         onFocus={ev => ev.target.value === '' && dispatch(errorActions.set_error("Search field must not be empty. Enter a value!"))}
         onBlur={ev => ev.target.value === '' && dispatch(errorActions.set_error(null))}
       >

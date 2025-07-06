@@ -11,6 +11,7 @@ export const authSlice = createSlice({
   reducers: {
     logout: (state) => {
       localStorage.removeItem('token');
+      window.location.href = '/login';
       state.token = null
       state.loading = false;
       state.error = null;

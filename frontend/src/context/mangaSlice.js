@@ -43,7 +43,6 @@ export const mangaActions = mangaSlice.actions;
 
 export default mangaSlice.reducer;
 
-
 export const find_mangas = (pagination = { limit: 48, offset: 0 }, title = false) => async (dispatch, getState) => {
   try {
     const token = getState().auth.token;
@@ -76,6 +75,27 @@ export const find_mangas = (pagination = { limit: 48, offset: 0 }, title = false
   } catch (error) {
     console.error("Erro ao buscar mangas na API:", error.response ? error.response.data : error.message)
   }
+};
+
+export const find_manga_id = (mangaId) => {
+  return async (dispatch, getState) => {
+    try {
+      const token = getState().auth.token;
+
+      if (!token) {
+        throw new Error("Tentativa de buscar mangá por ID sem token.");
+      }
+
+      const response = await apiClient.get(`/mangas/${mangaId}`, {
+        headers: { 'Authorization': token }
+      });
+
+      return response.data.manga;
+    } catch (error) {
+      console.error("Erro ao buscar o mangá por ID:", error.response ? error.response.data : error.message);
+      throw error;
+    }
+  };
 };
 
 export const get_cover_image = ({ mangaId, fileName }) => {

@@ -6,6 +6,7 @@ import cors from 'cors';
 // Rotas e middleware que seram usados
 import authRoutes from './routes/authRoutes.js';
 import mangaRoutes from './routes/mangaRoutes.js';
+import listRoutes from './routes/listRoutes.js';
 
 
 dotenv.config();
@@ -44,6 +45,7 @@ app.use(express.json());
 // ---- ROTAS DA API ---- //
 app.use('/api', authRoutes)
 app.use('/api', mangaRoutes)
+app.use('/api', listRoutes)
 
 
 

@@ -5,10 +5,6 @@ import jwt from 'jsonwebtoken';
 
 const router = express.Router();
 
-router.get('/auth/login', (req, res) => {
-  res.status(200).json({ response: [{ msg: 'Rota de teste GET /auth/login funcionando.' }] });
-});
-
 // Rota para login do usuário.
 router.post('/auth/login', 
    [
