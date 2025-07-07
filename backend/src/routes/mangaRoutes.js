@@ -3,7 +3,7 @@ import axios from 'axios';
 import sharp from 'sharp';
 import { query, param, validationResult } from 'express-validator';
 import { mangaModel } from '../models/mangaModel.js';
-import { authMiddleware } from '../middlewares.js';
+import { authMiddleware, cacheMiddleware } from '../middlewares.js';
 
 
 const router = express.Router();
@@ -11,7 +11,8 @@ const router = express.Router();
 // Middleware de autenticação
 router.use(authMiddleware)
 
-router.get('/mangas', 
+router.get('/mangas',
+  cacheMiddleware, // Cache para otimização de requisições
   [ // Validação 
     query('title').optional().trim().escape(),
     query('limit').optional().isInt({ min: 1, max: 100 }).toInt(),
@@ -63,7 +64,10 @@ router.get('/mangas/cover',
       .resize({ width: 400 })
       .jpeg({ quality: 80 })
       .toBuffer();
-      
+
+      // Definindo que o navegador pode guardar essa imagem por um determinado tempo
+      res.set('Cache-Control', 'public, max-age=86400'); // em segundos
+
       // Definindo o cabeçalho do tipo de dados a serem enviados
       res.set('Content-Type', 'image/jpeg');
       res.status(200).send(optimizedImageBuffer);

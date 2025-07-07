@@ -1,12 +1,16 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-
+import helmet from "helmet";
+import { rateLimit } from 'express-rate-limit'
+import compression from 'compression'
+import sanitizer from 'express-sanitizer'
 
 // Rotas e middleware que seram usados
 import authRoutes from './routes/authRoutes.js';
 import mangaRoutes from './routes/mangaRoutes.js';
 import listRoutes from './routes/listRoutes.js';
+import { logErrors } from './middlewares.js';
 
 
 dotenv.config();
@@ -20,7 +24,7 @@ const whitelist = [
   'http://localhost:5173',                                  // Front-end rodando localmente
   'https://kurolist.netlify.app',                           // Netlify main
   'https://kurolist-build.netlify.app',                     // Netlify build teste
-  'https://github.com/KuroUnit/KuroList.io',                 //GitHub Pages
+  'https://jandersonlsilva.github.io/Projeto-FullStack/',   // GitHub Pages
   
 ];
 
@@ -37,9 +41,18 @@ var corsOptions = {
 
 // Aplicando o objeto com as opções
 app.use(cors(corsOptions));
+app.use(helmet());
 
-//  Definindo o corpo de requisisções como JSON
-app.use(express.json());
+// Prevenção de Ataques Automatizados (Rate Limiting)
+const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 200, standardHeaders: true, legacyHeaders: false });
+app.use(limiter);
+
+// Otimização (Compressão Gzip)
+app.use(compression());
+
+// Parse e Sanitização
+app.use(express.json({ limit: '10kb' }));
+app.use(sanitizer());
 
 
 // ---- ROTAS DA API ---- //
@@ -47,6 +60,7 @@ app.use('/api', authRoutes)
 app.use('/api', mangaRoutes)
 app.use('/api', listRoutes)
 
-
+// Middleware de Erros
+app.use(logErrors);
 
 app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
